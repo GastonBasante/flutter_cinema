@@ -1,0 +1,49 @@
+```
+# -----------------------------
+# Flutter / Dart
+# -----------------------------
+.env
+.dart_tool/
+.packages
+.buildlog/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+
+# Archivos de build
+build/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Pods/
+macos/Pods/
+android/.gradle/
+android/app/build/
+
+# Archivos de cache
+*.log
+*.tmp
+
+# -----------------------------
+# Archivos de entorno / secretos
+# -----------------------------
+.env
+firebase_app_id_file.json
+google-services.json
+GoogleService-Info.plist
+
+
+
+
+# -----------------------------
+# IDE / Editor
+# -----------------------------
+.vscode/
+.idea/
+*.iml
+
+# -----------------------------
+# Sistema operativo
+# -----------------------------
+.DS_Store
+Thumbs.db
+```

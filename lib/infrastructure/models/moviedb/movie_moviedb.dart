@@ -8,6 +8,7 @@ class MovieMovieDB {
   final String overview;
   final double popularity;
   final String posterPath;
+  final int runtime;
   final String releaseDate;
   final String title;
   final bool video;
@@ -16,6 +17,7 @@ class MovieMovieDB {
 
   MovieMovieDB({
     required this.adult,
+    required this.runtime,
     required this.backdropPath,
     required this.genreIds,
     required this.id,
@@ -39,9 +41,10 @@ class MovieMovieDB {
     originalLanguage: json["original_language"],
     originalTitle: json["original_title"],
     overview: json["overview"] ?? '',
+    runtime: json["runtime"] ?? 0,
     popularity: json["popularity"]?.toDouble(),
     posterPath: json["poster_path"] ?? '',
-    releaseDate: json["release_date"] ?? '',
+    releaseDate: json["release_date"],
     title: json["title"],
     video: json["video"],
     voteAverage: json["vote_average"]?.toDouble(),
@@ -60,6 +63,7 @@ class MovieMovieDB {
     "poster_path": posterPath,
     "release_date": releaseDate,
     "title": title,
+    "runtime": runtime,
     "video": video,
     "vote_average": voteAverage,
     "vote_count": voteCount,

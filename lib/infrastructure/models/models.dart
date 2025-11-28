@@ -5,3 +5,4 @@ export 'package:cinemapedia/infrastructure/models/moviedb/credits_response.dart'
 export 'package:cinemapedia/infrastructure/models/moviedb/movie_moviedb.dart';
 export 'package:cinemapedia/infrastructure/models/moviedb/movie_providers_response.dart';
 export 'package:cinemapedia/infrastructure/models/moviedb/movie_reviews_response.dart';
+export 'package:cinemapedia/infrastructure/models/moviedb/movie_release_date.dart';

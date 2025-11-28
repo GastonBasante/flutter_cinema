@@ -19,4 +19,6 @@ abstract class MoviesRepository {
     required String movieId,
     int page = 1,
   });
+
+  Future<ReleaseDates> getReleaseDatesByMovie(String movieId);
 }

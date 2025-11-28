@@ -1,4 +1,5 @@
 import 'package:cinemapedia/domain/datasources/movies_datasources.dart';
+import 'package:cinemapedia/domain/entities/entities.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/domain/entities/provider_movie.dart';
 import 'package:cinemapedia/domain/entities/reviewer.dart';
@@ -50,5 +51,10 @@ class MovieRepositoryImpl extends MoviesRepository {
     int page = 1,
   }) {
     return datasource.getListReviewsByMovie(movieId: movieId, page: page);
+  }
+
+  @override
+  Future<ReleaseDates> getReleaseDatesByMovie(String movieId) {
+    return datasource.getReleaseDatesByMovie(movieId);
   }
 }

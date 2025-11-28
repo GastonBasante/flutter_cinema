@@ -7,7 +7,9 @@ import 'package:go_router/go_router.dart';
 class MovieHorizontalListview extends StatefulWidget {
   final List<Movie> movies;
   final String? title;
+  final Map<String, double>? config;
   final String? subTitle;
+
   final VoidCallback? loadNextPage;
 
   const MovieHorizontalListview({
@@ -16,6 +18,11 @@ class MovieHorizontalListview extends StatefulWidget {
     this.title,
     this.subTitle,
     this.loadNextPage,
+    this.config = const {
+      'width': 180.0,
+      'height': 250.0,
+      'margin-container': 8.00,
+    },
   });
 
   @override
@@ -60,7 +67,9 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
               itemCount: widget.movies.length,
               itemBuilder: (context, index) {
                 final movie = widget.movies[index];
-                return FadeInRight(child: _CardMovieView(movie: movie));
+                return FadeInRight(
+                  child: _CardMovieView(movie: movie, config: widget.config),
+                );
               },
             ),
           ),
@@ -72,13 +81,15 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
 
 class _CardMovieView extends StatelessWidget {
   final Movie movie;
-  const _CardMovieView({required this.movie});
+  final config;
+  const _CardMovieView({required this.movie, required this.config});
 
   @override
   Widget build(BuildContext context) {
     final textStyles = Theme.of(context).textTheme;
+    final size = MediaQuery.of(context).size;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8),
+      margin: EdgeInsets.symmetric(horizontal: config['margin-container']),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -87,8 +98,8 @@ class _CardMovieView extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadiusGeometry.circular(20),
               child: Image.network(
-                width: 180,
-                height: 250,
+                width: config['width'],
+                height: config['height'],
                 movie.backdropPath,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {

@@ -6,3 +6,4 @@ export 'movies/movie_info_provider.dart';
 export 'actors/actors_info_provider.dart';
 export 'actors/actors_repository_provider.dart';
 export 'movies/movie_review_provicer.dart';
+export 'movies/movie_company_provider.dart';

@@ -1,10 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/config/helpers/human_formats.dart';
-import 'package:cinemapedia/domain/entities/actor.dart';
-import 'package:cinemapedia/domain/entities/movie.dart';
-import 'package:cinemapedia/domain/entities/provider_movie.dart';
+import 'package:cinemapedia/domain/entities/entities.dart';
 import 'package:cinemapedia/infrastructure/models/models.dart';
-import 'package:cinemapedia/presentation/providers/movies/movie_company_provider.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/presentation/widgets/movies/movie_horizontal_listview.dart';
 import 'package:flutter/material.dart';
@@ -29,27 +26,14 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
     ref.read(watchProviderProvider.notifier).loadProviders(widget.movieId);
     ref.read(similarMoviesProvider.notifier).loadNextPageById(widget.movieId);
     ref.read(movieReviewProvider.notifier).loadAuthors(widget.movieId);
+    ref.read(releaseDatesProvider.notifier).loadRelease(widget.movieId);
   }
 
   @override
   Widget build(BuildContext context) {
     final Movie? movieInfo = ref.watch(movieInfoProvider)[widget.movieId];
-    final List<Movie>? similarMovie = ref.watch(
-      similarMoviesProvider,
-    )[widget.movieId];
 
-    final List<ProviderMovie>? movieProviders = ref.watch(
-      watchProviderProvider,
-    )[widget.movieId];
-
-    final List<Author>? movieReview = ref.watch(
-      movieReviewProvider,
-    )[widget.movieId];
-
-    if (movieInfo == null ||
-        movieProviders == null ||
-        similarMovie == null ||
-        movieReview == null) {
+    if (movieInfo == null) {
       return Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
@@ -60,12 +44,7 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               childCount: 1,
-              (context, index) => _MovieDetails(
-                movie: movieInfo,
-                similar: similarMovie,
-                movieProviders: movieProviders,
-                reviews: movieReview,
-              ),
+              (context, index) => _MovieDetails(movie: movieInfo),
             ),
           ),
         ],
@@ -76,21 +55,34 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 
 class _MovieDetails extends ConsumerWidget {
   final Movie movie;
-  final List<Movie> similar;
-  final List<ProviderMovie> movieProviders;
-  final List<Author> reviews;
-  const _MovieDetails({
-    required this.movie,
-    required this.movieProviders,
-    required this.similar,
-    required this.reviews,
-  });
+
+  const _MovieDetails({required this.movie});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final size = MediaQuery.of(context).size;
+    final movieId = movie.id.toString();
     final int totalReview = ref.watch(totalAuthorsProvider);
+    final List<Movie>? similarMovie = ref.watch(similarMoviesProvider);
+    final ReleaseDates? releaseDates = ref.watch(releaseDatesProvider)[movieId];
+
+    final List<ProviderMovie>? movieProviders = ref.watch(
+      watchProviderProvider,
+    )[movieId];
+
+    final List<Author>? movieReview = ref.watch(movieReviewProvider)[movieId];
+
+    if (similarMovie == null ||
+        movieReview == null ||
+        movieProviders == null ||
+        releaseDates == null) {
+      return Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final size = MediaQuery.of(context).size;
     final textStyle = Theme.of(context).textTheme;
+
     return SizedBox(
       child: Column(
         children: [
@@ -119,7 +111,18 @@ class _MovieDetails extends ConsumerWidget {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(movie.releaseDate),
+                    Text(movieProviders.isEmpty ? '' : 'Donde ver'),
+                    SizedBox(
+                      width: size.width * 0.3,
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.start,
+                        children: [
+                          ...movieProviders.map(
+                            (providers) => _ViewProviders(provider: providers),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
 
@@ -130,15 +133,38 @@ class _MovieDetails extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Wrap(
+                      Text(movie.title, style: textStyle.titleLarge),
+                      SizedBox(width: 5),
+                      Row(
                         children: [
-                          Text(movie.title, style: textStyle.titleLarge),
-                          SizedBox(width: 5),
-                          ...movieProviders.map(
-                            (providers) => _ViewProviders(provider: providers),
+                          releaseDates.certification == null ||
+                                  releaseDates.certification == ''
+                              ? SizedBox()
+                              : Container(
+                                  margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                                  decoration: BoxDecoration(
+                                    border: BoxBorder.all(
+                                      color: Color.fromRGBO(220, 220, 220, 1),
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    child: Text(releaseDates.certification!),
+                                  ),
+                                ),
+                          Text(
+                            movie.releaseDate == null
+                                ? ''
+                                : HumanFormats.dateDDMMYYYY(movie.releaseDate!),
                           ),
+                          SizedBox(width: 10),
+                          Text(HumanFormats.formatRuntime(movie.runtime)),
                         ],
-                      ),
+                      ), //TODO: dato de hora del video + edad
 
                       Text(movie.overview),
                       SizedBox(height: 5),
@@ -176,15 +202,47 @@ class _MovieDetails extends ConsumerWidget {
           _Title(title: 'Actores Principales'),
           _ActorsByMovie(movieId: movie.id),
           _Title(title: 'Reseñas ($totalReview)'),
-          _ReviewByMovie(reviews: reviews),
-          MovieHorizontalListview(
-            movies: similar,
-            title: 'Similares',
-            loadNextPage: () => ref
-                .read(similarMoviesProvider.notifier)
-                .loadNextPageById(movie.id.toString()),
-          ),
-          // Placeholder(),
+          totalReview == 0
+              ? SizedBox(
+                  height: 60,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text('No tenemos reseñas de ${movie.title}.'),
+                    ),
+                  ),
+                )
+              : _ReviewByMovie(reviews: movieReview),
+
+          similarMovie.isEmpty
+              ? SizedBox(
+                  height: 150,
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      _Title(title: 'Similares'),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'No tenemos suficiente información para recomendarte películas basadas en ${movie.title}.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : MovieHorizontalListview(
+                  movies: similarMovie,
+                  title: 'Similares',
+                  config: {
+                    'width': 135.00,
+                    'height': 180.00,
+                    'margin-container': 0.00,
+                  },
+                  loadNextPage: () => ref
+                      .read(similarMoviesProvider.notifier)
+                      .loadNextPageById(movie.id.toString()),
+                ),
         ],
       ),
     );
@@ -329,7 +387,7 @@ class _ViewProviders extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(right: 10),
+      margin: EdgeInsets.all(3),
       child: ClipRRect(
         borderRadius: BorderRadiusGeometry.circular(5),
         child: Image.network(

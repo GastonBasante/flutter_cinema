@@ -6,6 +6,12 @@ class HumanFormats {
     return text[0].toUpperCase() + text.substring(1);
   }
 
+  static String formatRuntime(int minutes) {
+    final hours = minutes ~/ 60;
+    final mins = minutes % 60;
+    return "${hours}h ${mins}m";
+  }
+
   static String number(double number) {
     final formattedNumber = NumberFormat.compactCurrency(
       decimalDigits: 0,

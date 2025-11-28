@@ -123,4 +123,33 @@ class MoviedbDatasource extends MoviesDatasources {
 
     return reviews;
   }
+
+  @override
+  Future<ReleaseDates> getReleaseDatesByMovie(String movieId) async {
+    final response = await dio.get('/movie/$movieId/release_dates');
+
+    if (response.statusCode != 200) {
+      return ReleaseDates.empty();
+    }
+
+    final providerResponse = MovieReleaseDatesResponse.fromJson(response.data);
+
+    // Buscar país AR
+    final releasesAR = providerResponse.results.where(
+      (m) => m.iso31661 == 'AR',
+    );
+
+    if (releasesAR.isEmpty) {
+      return ReleaseDates.empty();
+    }
+
+    final releaseAR = releasesAR.first;
+
+    // Obtener el release con el type más alto
+    final highest = releaseAR.releaseDates.reduce(
+      (a, b) => a.type > b.type ? a : b,
+    );
+
+    return MovieMapper.releaseDatesMovieToEntity(highest);
+  }
 }

@@ -29,9 +29,7 @@ final topRatedMoviesProvider =
     });
 
 final similarMoviesProvider =
-    StateNotifierProvider<SimilarMoviesNotifier, Map<String, List<Movie>>>((
-      ref,
-    ) {
+    StateNotifierProvider<SimilarMoviesNotifier, List<Movie>>((ref) {
       final fetchMoreMovies = ref
           .watch(movieRepositoryProvider)
           .getMovieSimilar;
@@ -61,12 +59,12 @@ class MoviesNotifier extends StateNotifier<List<Movie>> {
   }
 }
 
-class SimilarMoviesNotifier extends StateNotifier<Map<String, List<Movie>>> {
+class SimilarMoviesNotifier extends StateNotifier<List<Movie>> {
   final MovieSimilarCallback fetchMoreMovies;
   int currentPage = 0;
   bool isLoading = false;
 
-  SimilarMoviesNotifier({required this.fetchMoreMovies}) : super({});
+  SimilarMoviesNotifier({required this.fetchMoreMovies}) : super([]);
 
   Future<void> loadNextPageById(String movieId) async {
     if (isLoading) return;
@@ -74,7 +72,7 @@ class SimilarMoviesNotifier extends StateNotifier<Map<String, List<Movie>>> {
     currentPage++;
     final movies = await fetchMoreMovies(movieId: movieId, page: currentPage);
 
-    state = {...state, movieId: movies};
+    state = [...state, ...movies];
 
     isLoading = false;
   }

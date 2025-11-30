@@ -1,16 +1,8 @@
 import 'package:cinemapedia/config/constants/environment.dart';
+import 'package:cinemapedia/config/helpers/date_parser.dart';
 import 'package:cinemapedia/domain/entities/entities.dart';
 
 import 'package:cinemapedia/infrastructure/models/models.dart';
-
-DateTime? _safeParseDate(String? value) {
-  if (value == null || value.trim().isEmpty) return null;
-  try {
-    return DateTime.parse(value);
-  } catch (_) {
-    return null;
-  }
-}
 
 class MovieMapper {
   static Movie movieDBToEntity(MovieMovieDB moviedb) => Movie(
@@ -28,7 +20,7 @@ class MovieMapper {
     posterPath: moviedb.posterPath.isNotEmpty
         ? '${Environment.theMovieDbImage}${moviedb.posterPath}'
         : 'no-poster',
-    releaseDate: _safeParseDate(moviedb.releaseDate),
+    releaseDate: SafeParser.date(moviedb.releaseDate),
     title: moviedb.title,
     video: moviedb.video,
     voteAverage: moviedb.voteAverage,
@@ -50,11 +42,20 @@ class MovieMapper {
     posterPath: movie.posterPath.isNotEmpty
         ? '${Environment.theMovieDbImage}${movie.posterPath}'
         : 'https://cdn.displate.com/artwork/857x1200/2022-04-15/7422bfe15b3ea7b5933dffd896e9c7f9_46003a1b7353dc7b5a02949bd074432a.jpg',
-    releaseDate: _safeParseDate(movie.releaseDate),
+    releaseDate: SafeParser.date(movie.releaseDate),
     title: movie.title,
     video: movie.video,
     voteAverage: movie.voteAverage,
     voteCount: movie.voteCount,
+  );
+
+  static Actor castToEntity(Cast cast) => Actor(
+    id: cast.id,
+    name: cast.name,
+    profilePath: cast.profilePath != null
+        ? '${Environment.theMovieDbImage}${cast.profilePath}'
+        : 'https://i.pinimg.com/736x/2c/47/d5/2c47d5dd5b532f83bb55c4cd6f5bd1ef.jpg',
+    character: cast.character,
   );
 
   static ProviderMovie providerWatchToEntity(Flatrate provider) =>

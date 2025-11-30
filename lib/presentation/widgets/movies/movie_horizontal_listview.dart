@@ -87,7 +87,6 @@ class _CardMovieView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textStyles = Theme.of(context).textTheme;
-    final size = MediaQuery.of(context).size;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: config['margin-container']),
       child: Column(

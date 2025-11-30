@@ -1,3 +1,4 @@
+import 'package:cinemapedia/presentation/screens/person/person_screen.dart';
 import 'package:cinemapedia/presentation/screens/screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -16,6 +17,14 @@ final GoRouter router = GoRouter(
           builder: (context, state) {
             final movieId = state.pathParameters['id'] ?? 'no-id';
             return MovieScreen(movieId: movieId);
+          },
+        ),
+        GoRoute(
+          path: 'person/:id',
+          name: PersonScreen.name,
+          builder: (context, state) {
+            final personId = state.pathParameters['id'] ?? 'no-id';
+            return PersonScreen(personId: personId);
           },
         ),
       ],

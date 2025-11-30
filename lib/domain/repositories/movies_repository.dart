@@ -15,6 +15,8 @@ abstract class MoviesRepository {
 
   Future<List<ProviderMovie>> getWatchProviders(String movieId);
 
+  Future<List<Actor>> getActorsByMovie(String movieId);
+
   Future<Reviewer> getListReviewsByMovie({
     required String movieId,
     int page = 1,

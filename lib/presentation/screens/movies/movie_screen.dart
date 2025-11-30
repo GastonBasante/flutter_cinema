@@ -6,6 +6,7 @@ import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/presentation/widgets/movies/movie_horizontal_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class MovieScreen extends ConsumerStatefulWidget {
   static const name = 'movie-screen';
@@ -164,7 +165,7 @@ class _MovieDetails extends ConsumerWidget {
                           SizedBox(width: 10),
                           Text(HumanFormats.formatRuntime(movie.runtime)),
                         ],
-                      ), //TODO: dato de hora del video + edad
+                      ),
 
                       Text(movie.overview),
                       SizedBox(height: 5),
@@ -309,6 +310,7 @@ class _ViewReviwers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme;
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -349,15 +351,33 @@ class _ViewReviwers extends StatelessWidget {
                     children: [
                       Text(
                         'Una reseña de ${review.author}',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: textStyle.bodyLarge!.fontSize,
+                        ),
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 4),
-                      Text(
-                        'Escrito por ${review.author} el ${HumanFormats.dateDDEMMMMYYYY(review.createdAt)}',
+                      RichText(
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
+                        text: TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: [
+                            const TextSpan(text: 'Escrito por '),
+                            TextSpan(
+                              text: review.author,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text:
+                                  ' el ${HumanFormats.dateDDEMMMMYYYY(review.createdAt)}',
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -468,7 +488,10 @@ class _ViewActors extends StatelessWidget {
                   if (loadingProgress != null) {
                     return SizedBox(width: 135, height: 180);
                   }
-                  return FadeIn(child: child);
+                  return GestureDetector(
+                    onTap: () => context.push('/person/${actor.id}'),
+                    child: FadeIn(child: child),
+                  );
                 },
               ),
             ),

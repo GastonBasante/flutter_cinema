@@ -9,3 +9,4 @@ export 'package:cinemapedia/infrastructure/models/moviedb/movies/movie_reviews_r
 export 'package:cinemapedia/infrastructure/models/moviedb/movies/movie_release_date.dart';
 export 'package:cinemapedia/infrastructure/models/moviedb/person/person_response.dart';
 export 'package:cinemapedia/infrastructure/models/moviedb/person/social_media_actor.dart';
+export 'package:cinemapedia/infrastructure/models/moviedb/movies/movies_and_series.dart';

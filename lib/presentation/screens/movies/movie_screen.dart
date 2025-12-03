@@ -4,6 +4,7 @@ import 'package:cinemapedia/domain/entities/entities.dart';
 import 'package:cinemapedia/infrastructure/models/models.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/presentation/widgets/movies/movie_horizontal_listview.dart';
+import 'package:cinemapedia/presentation/widgets/shared/title_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -62,7 +63,6 @@ class _MovieDetails extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final movieId = movie.id.toString();
-    final int totalReview = ref.watch(totalAuthorsProvider);
     final List<Movie>? similarMovie = ref.watch(similarMoviesProvider);
     final ReleaseDates? releaseDates = ref.watch(releaseDatesProvider)[movieId];
 
@@ -70,7 +70,7 @@ class _MovieDetails extends ConsumerWidget {
       watchProviderProvider,
     )[movieId];
 
-    final List<Author>? movieReview = ref.watch(movieReviewProvider)[movieId];
+    final Reviewer? movieReview = ref.watch(movieReviewProvider)[movieId];
 
     if (similarMovie == null ||
         movieReview == null ||
@@ -200,10 +200,10 @@ class _MovieDetails extends ConsumerWidget {
 
           //genero de las pelicula
           // SizedBox(height: 5),
-          _Title(title: 'Actores Principales'),
+          TitleField(title: 'Actores Principales'),
           _ActorsByMovie(movieId: movie.id),
-          _Title(title: 'Reseñas ($totalReview)'),
-          totalReview == 0
+          TitleField(title: 'Reseñas (${movieReview.totalResults})'),
+          movieReview.totalResults == 0
               ? SizedBox(
                   height: 60,
                   child: Padding(
@@ -221,7 +221,7 @@ class _MovieDetails extends ConsumerWidget {
                   width: double.infinity,
                   child: Column(
                     children: [
-                      _Title(title: 'Similares'),
+                      TitleField(title: 'Similares'),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
@@ -251,7 +251,7 @@ class _MovieDetails extends ConsumerWidget {
 }
 
 class _ReviewByMovie extends StatelessWidget {
-  final List<Author> reviews;
+  final Reviewer reviews;
   const _ReviewByMovie({required this.reviews});
 
   @override
@@ -285,11 +285,11 @@ class _ReviewByMovie extends StatelessWidget {
               builder: (context, constraints) {
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: reviews.length,
+                  itemCount: reviews.author.length,
                   itemBuilder: (context, index) {
-                    final review = reviews[index];
+                    final review = reviews.author[index];
                     return SizedBox(
-                      width: constraints.maxWidth, // 100% del contenedor
+                      width: constraints.maxWidth,
                       child: _ViewReviwers(review: review),
                     );
                   },
@@ -567,29 +567,6 @@ class _CustomSliverAppBar extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Title extends StatelessWidget {
-  final String title;
-  const _Title({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: SizedBox(
-        height: 30,
-        width: double.infinity,
-        child: Text(
-          title,
-          maxLines: 2,
-          style: textStyle.titleLarge,
-          textAlign: TextAlign.start,
         ),
       ),
     );
